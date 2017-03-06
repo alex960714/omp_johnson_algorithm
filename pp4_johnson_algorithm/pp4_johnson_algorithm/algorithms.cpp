@@ -5,10 +5,11 @@ bool Bellman_Ford(list<edge> *v, int vert_num, int vert, int *dist)
 {
 	int curr_edge;
 	list<edge>::iterator it;
-	dist[vert] = 0;
+
 	for (int i = 0; i < vert_num; i++)
-		if (i != vert)
-			dist[i] = INT_MAX;
+		dist[i] = INT_MAX;
+	dist[vert] = 0;
+
 	for (int i = 0; i < vert_num - 1; i++)
 	{
 		for (int j = 0; j < vert_num; j++)
@@ -42,7 +43,33 @@ bool Bellman_Ford(list<edge> *v, int vert_num, int vert, int *dist)
 	return true;
 }
 
-void Dijkstra(list<edge> *v, int size, int vert, int *dist)
+void Dijkstra(list<edge> *v, int vert_num, int vert, int *dist)
 {
+	d_heap Q;
+	d_node *curr_node;
+	list<edge>::iterator it;
+	int curr_vert, curr_edge;
 
+	for (int i = 0; i < vert_num; i++)
+		dist[i] = INT_MAX;
+	dist[vert] = 0;
+
+	Q.MakeHeap(dist, vert_num);
+	//Q.Insert(vert, dist[vert]);
+	while (!Q.IsEmpty())
+	{
+		curr_node = Q.DeleteMin();
+		curr_vert = curr_node->node;
+		for (it = v[curr_vert].begin(); it != v[curr_vert].end(); ++it)
+		{
+			curr_edge = dist[curr_vert] + it->weight;
+			if (dist[it->node] > curr_edge)
+			{
+				dist[it->node] = curr_edge;
+				//Q.Delete(it->node);
+				//Q.Insert(it->node, dist[it->node]);
+				Q.DecreaseWeight(it->node, it->weight - dist[it->node]);
+			}
+		}
+	}
 }
