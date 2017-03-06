@@ -6,15 +6,19 @@ using namespace std;
 
 struct d_node 
 {
-	d_node *prev;
-	d_node **child;
+	int node;
+	int weight;
+	/*d_node *prev;
+	d_node **child;*/
 };
 
 class d_heap
 {
 private:
 	int d;
-	map<int,int> weight;
+	int power;
+	d_node *root;
+	int *weight;
 
 	void Swap(int node1, int node2);
 	void Diving(int node);
@@ -28,10 +32,12 @@ public:
 	int GetParent(int node);
 	int GetMinChild(int node);
 
-	void Insert(int w);
+	void Insert(int node, int w);
 	void DecreaseWeight(int node, int delta);
-	void DeleteMin();
-	void Delete(int node);
+	d_node* DeleteMin();
+	d_node* Delete(int node);
 	void MakeHeap(int *w, int num);
+
+	bool IsEmpty() { return !power; }
 };
 #endif
