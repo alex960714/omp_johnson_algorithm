@@ -2,9 +2,17 @@
 
 void d_heap::Swap(int node1, int node2)
 {
-	int tmp = weight[node1];
-	weight[node1] = weight[node2];
-	weight[node2] = tmp;
+	int tmp_w = weights[vert_pointer[node1]].weight;
+	int tmp_n = vert_pointer[node1];
+
+	weights[tmp_n].weight = weights[vert_pointer[node2]].weight;
+	weights[tmp_n].node=node2;
+
+	weights[vert_pointer[node2]].weight = tmp_w;
+	weights[vert_pointer[node2]].node = node1;
+
+	vert_pointer[node1] = vert_pointer[node2];
+	vert_pointer[node2] = tmp_n;
 }
 
 void d_heap::Diving(int node)
@@ -110,9 +118,15 @@ d_node* d_heap::Delete(int node)
 
 void d_heap::MakeHeap(int *w, int num)
 {
-	weight = new int[num];
+	weights = new d_node[num];
+	vert_pointer = new int[num];
+
 	for (int i = 0; i < num; i++)
-		weight[i] = w[i];
+	{
+		weights[i].node = i;
+		weights[i].weight = w[i];
+		vert_pointer[i] = i;
+	}
 	power = num;
 
 	for (int i = power - 1; i >= 0; i--)
