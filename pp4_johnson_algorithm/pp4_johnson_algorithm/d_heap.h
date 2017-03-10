@@ -12,8 +12,8 @@ struct d_node
 	d_node **child;*/
 };
 
-bool operator<(d_node &node1, d_node &node2) { return node1.weight < node2.weight; };
-bool operator>(d_node &node1, d_node &node2) { return node1.weight > node2.weight; };
+inline bool operator<(d_node &node1, d_node &node2) { return node1.weight < node2.weight; };
+inline bool operator>(d_node &node1, d_node &node2) { return node1.weight > node2.weight; };
 
 class d_heap
 {

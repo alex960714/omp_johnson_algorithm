@@ -46,7 +46,7 @@ bool Bellman_Ford(list<edge> *v, int vert_num, int vert, int *dist)
 void Dijkstra(list<edge> *v, int vert_num, int vert, int *dist)
 {
 	d_heap Q;
-	d_node *curr_node;
+	d_node curr_node;
 	list<edge>::iterator it;
 	int curr_vert, curr_edge;
 
@@ -59,7 +59,7 @@ void Dijkstra(list<edge> *v, int vert_num, int vert, int *dist)
 	while (!Q.IsEmpty())
 	{
 		curr_node = Q.DeleteMin();
-		curr_vert = curr_node->node;
+		curr_vert = curr_node.node;
 		for (it = v[curr_vert].begin(); it != v[curr_vert].end(); ++it)
 		{
 			curr_edge = dist[curr_vert] + it->weight;
