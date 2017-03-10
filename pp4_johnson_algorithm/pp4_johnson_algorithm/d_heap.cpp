@@ -19,7 +19,7 @@ void d_heap::Diving(int node)
 {
 	int curr_node = node;
 	int child = GetMinChild(node);
-	while (child != -1 && weight[curr_node] > weight[child])
+	while (child != -1 && weights[vert_pointer[curr_node]].weight > weights[vert_pointer[child]].weight)
 	{
 		Swap(curr_node, child);
 		curr_node = child;
@@ -31,7 +31,7 @@ void d_heap::Emersion(int node)
 {
 	int curr_node = node;
 	int parent = GetParent(node);
-	while (parent != -1 && weight[curr_node] < weight[parent])
+	while (parent != -1 && weights[vert_pointer[curr_node]].weight < weights[vert_pointer[parent]].weight)
 	{
 		Swap(curr_node, parent);
 		curr_node = parent;
@@ -41,10 +41,10 @@ void d_heap::Emersion(int node)
 
 int d_heap::GetLeft(int node)
 {
-	int tmp = node*d + 1;
+	int tmp = vert_pointer[node]*d + 1;
 	if (tmp >= power)
 		return -1;
-	return tmp;
+	return weights[tmp].node;
 }
 
 int d_heap::GetRight(int node)
@@ -52,17 +52,18 @@ int d_heap::GetRight(int node)
 	int tmp = GetLeft(node);
 	if (tmp == -1)
 		return -1;
-	tmp += (d - 1);
+	tmp = vert_pointer[tmp] + (d - 1);
 	if (tmp >= power - 1)
-		return power - 1;
-	return tmp;
+		return weights[power - 1].node;
+	return weights[tmp].node;
 }
 
 int d_heap::GetParent(int node)
 {
-	if (!node)
+	int tmp = vert_pointer[node];
+	if (!tmp)
 		return -1;
-	return (node - 1) / d;
+	return weights[(node - 1) / d].node;
 }
 
 int d_heap::GetMinChild(int node)
@@ -71,18 +72,18 @@ int d_heap::GetMinChild(int node)
 	if (child1 == -1)
 		return -1;
 
-	int min = weight[child1];
-	int min_node = child1;
+	int min = weights[vert_pointer[child1]].weight;
+	int min_node = vert_pointer[child1];
 
-	for (int i = child1 + 1; i <= GetRight(node); i++)
+	for (int i = child1 + 1; i <= vert_pointer[GetRight(node)]; i++)
 	{
-		if (min > weight[i])
+		if (min > weights[i].weight)
 		{
-			min = weight[i];
+			min = weights[i].weight;
 			min_node = i;
 		}
 	}
-	return min_node;
+	return weights[min_node].node;
 }
 
 void d_heap::Insert(int node, int w)
@@ -93,27 +94,28 @@ void d_heap::Insert(int node, int w)
 
 void d_heap::DecreaseWeight(int node, int delta)
 {
-	weight[node] -= delta;
+	weights[vert_pointer[node]].weight -= delta;
 	if (delta > 0)
 		Emersion(node);
 	else
 		Diving(node);
 }
 
-d_node* d_heap::DeleteMin()
+d_node d_heap::DeleteMin()
 {
 	d_node *tmp = new d_node;
 	//tmp->node=
 	Swap(0, power - 1);
 	power--;
 	Diving(0);
+	return weights[power - 1];
 }
 
-d_node* d_heap::Delete(int node)
+d_node d_heap::Delete(int node)
 {
-	DecreaseWeight(node, weight[node]);
-	DecreaseWeight(node, INT_MAX);
-	DeleteMin();
+	DecreaseWeight(node, weights[vert_pointer[node]].weight+1);
+	//DecreaseWeight(node, INT_MAX);
+	return DeleteMin();
 }
 
 void d_heap::MakeHeap(int *w, int num)

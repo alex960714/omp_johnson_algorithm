@@ -38,8 +38,8 @@ public:
 
 	void Insert(int node, int w);
 	void DecreaseWeight(int node, int delta);
-	d_node* DeleteMin();
-	d_node* Delete(int node);
+	d_node DeleteMin();
+	d_node Delete(int node);
 	void MakeHeap(int *w, int num);
 
 	bool IsEmpty() { return !power; }
