@@ -103,12 +103,10 @@ void d_heap::DecreaseWeight(int node, int delta)
 
 d_node d_heap::DeleteMin()
 {
-	d_node *tmp = new d_node;
-	//tmp->node=
 	Swap(0, power - 1);
 	power--;
 	Diving(0);
-	return weights[power - 1];
+	return weights[power];
 }
 
 d_node d_heap::Delete(int node)

@@ -16,13 +16,15 @@ void del_mem();
 
 int main(int argc, char **argv)
 {
-	if (argc < 3)
+	/*if (argc < 3)
 	{
 		printf("So few arguments\n");
 		exit(0);
 	}
 	vert_num = atoi(argv[1]);
-	coeff = atoi(argv[2]);
+	coeff = atoi(argv[2]);*/
+	vert_num = 10;
+	coeff = 50;
 
 	generate_graph();
 	if (!Bellman_Ford(edges, vert_num + 1, vert_num, pre_dist))
@@ -101,7 +103,7 @@ bool check_results()
 {
 	if (vert_num < 20)
 	{
-		printf("Adjancency lists:");
+		printf("Adjacency lists:");
 		list<edge>::iterator it;
 		for (int i = 0; i < vert_num; i++)
 		{

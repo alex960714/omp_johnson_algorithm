@@ -19,7 +19,7 @@ bool Bellman_Ford(list<edge> *v, int vert_num, int vert, int *dist)
 			for (it = v[j].begin(); it != v[j].end(); ++it)
 			{
 				curr_edge = dist[j] + it->weight;
-				if (dist[it->node]>curr_edge)
+				if (dist[it->node]>curr_edge && dist[j] != INT_MAX)
 					dist[it->node] = curr_edge;
 			}
 		}
@@ -63,7 +63,7 @@ void Dijkstra(list<edge> *v, int vert_num, int vert, int *dist)
 		for (it = v[curr_vert].begin(); it != v[curr_vert].end(); ++it)
 		{
 			curr_edge = dist[curr_vert] + it->weight;
-			if (dist[it->node] > curr_edge)
+			if (dist[it->node] > curr_edge && dist[curr_vert]!=INT_MAX)
 			{
 				dist[it->node] = curr_edge;
 				//Q.Delete(it->node);
