@@ -65,10 +65,11 @@ void Dijkstra(list<edge> *v, int vert_num, int vert, int *dist)
 			curr_edge = dist[curr_vert] + it->weight;
 			if (dist[it->node] > curr_edge && dist[curr_vert]!=INT_MAX)
 			{
+				Q.DecreaseWeight(it->node, dist[it->node] - curr_edge);
 				dist[it->node] = curr_edge;
 				//Q.Delete(it->node);
 				//Q.Insert(it->node, dist[it->node]);
-				Q.DecreaseWeight(it->node, it->weight - dist[it->node]);
+				
 			}
 		}
 	}

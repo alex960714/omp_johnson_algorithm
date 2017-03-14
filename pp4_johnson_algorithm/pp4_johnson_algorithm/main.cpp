@@ -27,7 +27,7 @@ int main(int argc, char **argv)
 	coeff = 50;
 
 	generate_graph();
-	if (!Bellman_Ford(edges, vert_num + 1, vert_num, pre_dist))
+	if (!Bellman_Ford(edges, vert_num + 1, vert_num, delta))
 	{
 		printf("There is negative cycle in graph\n");
 		exit(0);

@@ -63,7 +63,7 @@ int d_heap::GetParent(int node)
 	int tmp = vert_pointer[node];
 	if (!tmp)
 		return -1;
-	return weights[(node - 1) / d].node;
+	return weights[(tmp - 1) / d].node;
 }
 
 int d_heap::GetMinChild(int node)
@@ -103,9 +103,9 @@ void d_heap::DecreaseWeight(int node, int delta)
 
 d_node d_heap::DeleteMin()
 {
-	Swap(0, power - 1);
+	Swap(weights[0].node, weights[power - 1].node);
 	power--;
-	Diving(0);
+	Diving(weights[0].node);
 	return weights[power];
 }
 
