@@ -22,7 +22,6 @@ void d_heap::Diving(int node)
 	while (child != -1 && weights[vert_pointer[curr_node]].weight > weights[vert_pointer[child]].weight)
 	{
 		Swap(curr_node, child);
-		curr_node = child;
 		child = GetMinChild(curr_node);
 	}
 }
@@ -34,7 +33,6 @@ void d_heap::Emersion(int node)
 	while (parent != -1 && weights[vert_pointer[curr_node]].weight < weights[vert_pointer[parent]].weight)
 	{
 		Swap(curr_node, parent);
-		curr_node = parent;
 		parent = GetParent(curr_node);
 	}
 }
@@ -75,7 +73,7 @@ int d_heap::GetMinChild(int node)
 	int min = weights[vert_pointer[child1]].weight;
 	int min_node = vert_pointer[child1];
 
-	for (int i = child1 + 1; i <= vert_pointer[GetRight(node)]; i++)
+	for (int i = vert_pointer[child1] + 1; i <= vert_pointer[GetRight(node)]; i++)
 	{
 		if (min > weights[i].weight)
 		{

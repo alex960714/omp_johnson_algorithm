@@ -2,13 +2,16 @@
 #include "algorithms.h"
 #include <list>
 #include <time.h>
+#include <fstream>
 using namespace std;
 
 int vert_num, coeff;
 int *pre_dist, *delta, **dist;
 list<edge> *edges;
 
+void mem_init();
 void generate_graph();
+void read_graph_from_txt();
 void count_edges1();
 void count_edges2(int *curr_dist, int vert);
 bool check_results();
@@ -23,13 +26,14 @@ int main(int argc, char **argv)
 	}
 	vert_num = atoi(argv[1]);
 	coeff = atoi(argv[2]);*/
-	vert_num = 10;
+	vert_num = 7;
 	coeff = 50;
 
+	mem_init();
 	generate_graph();
 	if (!Bellman_Ford(edges, vert_num + 1, vert_num, delta))
 	{
-		printf("There is negative cycle in graph\n");
+		printf("\nThere is negative cycle in graph\n");
 		exit(0);
 	}
 	count_edges1();
@@ -46,37 +50,75 @@ int main(int argc, char **argv)
 	return 0;
 }
 
-void generate_graph()
+void mem_init()
 {
-	int value;
-	//edge *curr_edge;
-	srand(time(nullptr));
 	edges = new list<edge>[vert_num + 1];
 	pre_dist = new int[vert_num + 1];
 	delta = new int[vert_num + 1];
 	dist = new int*[vert_num];
 	for (int i = 0; i < vert_num; i++)
 		dist[i] = new int[vert_num];
+}
 
-	for (int i = 0; i < vert_num; i++)
-	{
-		for (int j = 0; j < vert_num; j++)
+void generate_graph()
+{
+	int value;
+	//edge *curr_edge;
+	srand(time(nullptr));
+	
+	//if (argc == 3)
+		//read_graph_from_txt();
+	/*else
+	{*/
+		for (int i = 0; i < vert_num; i++)
 		{
-			value = rand() % 100;
-			if (value <= coeff && i != j)
+			for (int j = 0; j < vert_num; j++)
 			{
-				/*curr_edge = new edge();
-				curr_edge->node = j;
-				curr_edge->weight = value;*/
-				edges[i].push_back({j,value});
+				value = rand() % 100;
+				if (value <= coeff && i != j)
+				{
+					edges[i].push_back({ j,value - 10 });
+				}
 			}
 		}
-	}
+	//}
 	for (int i = 0; i < vert_num; i++)
 	{
 		if (i != vert_num)
 			edges[vert_num].push_back({ i,0 });
 	}
+	if (vert_num < 20)
+	{
+		printf("Adjacency lists:");
+		list<edge>::iterator it;
+		for (int i = 0; i < vert_num; i++)
+		{
+			printf("\n%d:", i);
+			for (it = edges[i].begin(); it != edges[i].end(); ++it)
+			{
+				printf(" {%d, %d} ", (*it).node, (*it).weight);
+			}
+		}
+	}
+}
+
+void read_graph_from_txt()
+{
+	int buf1, buf2;
+	ifstream is;
+	is.open("graph.txt");
+	for (int i = 0; i < vert_num; i++)
+	{
+		for (int j = 0; j < vert_num; j++)
+		{
+			is >> buf1;
+			if (buf1 == -1)
+				break;
+			is >> buf2;
+			edges[i].push_back({ buf1, buf2 });
+		}
+	}
+	is.close();
 }
 
 void count_edges1()
@@ -103,16 +145,7 @@ bool check_results()
 {
 	if (vert_num < 20)
 	{
-		printf("Adjacency lists:");
-		list<edge>::iterator it;
-		for (int i = 0; i < vert_num; i++)
-		{
-			printf("\n%d:", i);
-			for (it = edges[i].begin(); it != edges[i].end(); ++it)
-			{
-				printf(" {%d, %d} ", (*it).node, (*it).weight);
-			}
-		}
+		
 		printf("\n\nDistances:\n");
 		for (int i = 0; i < vert_num; i++)
 		{
