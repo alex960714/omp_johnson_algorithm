@@ -7,10 +7,10 @@
 using namespace std;
 
 int vert_num, coeff, edges_num;
-int *pre_dist, *delta, **dist;
+int *pre_dist, *delta, **dist_par;
 list<edge> *edges;
 
-double seq_time_st, seq_time_en;
+double par_time_st, par_time_en;
 
 void mem_init();
 void generate_graph();
@@ -22,37 +22,37 @@ void del_mem();
 
 int main(int argc, char **argv)
 {
-	/*if (argc < 3)
+	if (argc < 3)
 	{
 		printf("So few arguments\n");
 		exit(0);
 	}
 	vert_num = atoi(argv[1]);
-	coeff = atoi(argv[2]);*/
-	vert_num = 2000;
-	coeff = 1;
+	coeff = atoi(argv[2]);
+	/*vert_num = 2000;
+	coeff = 1;*/
 
 	mem_init();
 	generate_graph();
 
-	seq_time_st = omp_get_wtime();
+	par_time_st = omp_get_wtime();
 	if (!Bellman_Ford(edges, vert_num + 1, vert_num, delta))
 	{
 		printf("\nThere is negative cycle in graph\n");
 		exit(0);
 	}
 	count_edges1();
-
+	int i;
 #pragma omp parallel
 	{
 		#pragma omp for
-		for (int i = 0; i < vert_num; i++)
+		for (i = 0; i < vert_num; i++)
 		{
-			Dijkstra(edges, vert_num, i, dist[i]);
-			count_edges2(dist[i], i);
+			Dijkstra(edges, vert_num, i, dist_par[i]);
+			count_edges2(dist_par[i], i);
 		}
 	}
-	seq_time_en = omp_get_wtime();
+	par_time_en = omp_get_wtime();
 	check_results();
 
 	del_mem();
@@ -64,9 +64,9 @@ void mem_init()
 	edges = new list<edge>[vert_num + 1];
 	pre_dist = new int[vert_num + 1];
 	delta = new int[vert_num + 1];
-	dist = new int*[vert_num];
+	dist_par = new int*[vert_num];
 	for (int i = 0; i < vert_num; i++)
-		dist[i] = new int[vert_num];
+		dist_par[i] = new int[vert_num];
 }
 
 void generate_graph()
@@ -87,7 +87,7 @@ void generate_graph()
 				value = rand() % 1000;
 				if (value <= coeff && i != j)
 				{
-					edges[i].push_back({ j,rand()%1000 });
+					edges[i].push_back({ j,rand()%10 - 1 });
 					edges_num++;
 				}
 			}
@@ -135,6 +135,7 @@ void read_graph_from_txt()
 void count_edges1()
 {
 	list<edge>::iterator it;
+#pragma omp parallel for private(it)
 	for (int i = 0; i < vert_num; i++)
 	{
 		for (it = edges[i].begin(); it != edges[i].end(); ++it)
@@ -161,20 +162,20 @@ bool check_results()
 		for (int i = 0; i < vert_num; i++)
 		{
 			for (int j = 0; j < vert_num; j++)
-				printf("%d ", dist[i][j]);
+				printf("%d ", dist_par[i][j]);
 			printf("\n");
 		}
 	}
 	printf("Vertexes: %d\nEdges: %d\n", vert_num, edges_num);
-	printf("Sequential algorithm time: %f\n", seq_time_en - seq_time_st);
+	printf("Parallel version time: %f\n", par_time_en - par_time_st);
 	return true;
 }
 
 void del_mem()
 {
 	for (int i = 0; i < vert_num; i++)
-		delete[] dist[i];
-	delete[] dist;
+		delete[] dist_par[i];
+	delete[] dist_par;
 	delete[] pre_dist;
 	delete[] delta;
 	delete[] edges;

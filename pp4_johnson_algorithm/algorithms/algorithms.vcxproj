@@ -134,12 +134,12 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\pp4_johnson_algorithm\algorithms.h" />
-    <ClInclude Include="..\pp4_johnson_algorithm\d_heap.h" />
+    <ClInclude Include="algorithms.h" />
+    <ClInclude Include="d_heap.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\pp4_johnson_algorithm\algorithms.cpp" />
-    <ClCompile Include="..\pp4_johnson_algorithm\d_heap.cpp" />
+    <ClCompile Include="algorithms.cpp" />
+    <ClCompile Include="d_heap.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

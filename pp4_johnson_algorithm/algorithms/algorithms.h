@@ -10,7 +10,7 @@ struct edge
 	int weight;
 };
 
-bool Bellman_Ford(list<edge> *v, int vert_num, int vert, int *dist);
-void Dijkstra(list<edge> *v, int vert_num, int vert, int *dist);
+bool Bellman_Ford(list<edge> *v, int vert_num, int vert, int *dist_par);
+void Dijkstra(list<edge> *v, int vert_num, int vert, int *dist_par);
 
 #endif
