@@ -3,11 +3,14 @@
 #include <list>
 #include <time.h>
 #include <fstream>
+#include <omp.h>
 using namespace std;
 
-int vert_num, coeff;
+int vert_num, coeff, edges_num;
 int *pre_dist, *delta, **dist;
 list<edge> *edges;
+
+double seq_time_st, seq_time_en;
 
 void mem_init();
 void generate_graph();
@@ -26,11 +29,13 @@ int main(int argc, char **argv)
 	}
 	vert_num = atoi(argv[1]);
 	coeff = atoi(argv[2]);*/
-	vert_num = 7;
-	coeff = 50;
+	vert_num = 2000;
+	coeff = 1;
 
 	mem_init();
 	generate_graph();
+
+	seq_time_st = omp_get_wtime();
 	if (!Bellman_Ford(edges, vert_num + 1, vert_num, delta))
 	{
 		printf("\nThere is negative cycle in graph\n");
@@ -43,7 +48,7 @@ int main(int argc, char **argv)
 		Dijkstra(edges, vert_num, i, dist[i]);
 		count_edges2(dist[i],i);
 	}
-
+	seq_time_en = omp_get_wtime();
 	check_results();
 
 	del_mem();
@@ -63,6 +68,7 @@ void mem_init()
 void generate_graph()
 {
 	int value;
+	edges_num = 0;
 	//edge *curr_edge;
 	srand(time(nullptr));
 	
@@ -74,10 +80,11 @@ void generate_graph()
 		{
 			for (int j = 0; j < vert_num; j++)
 			{
-				value = rand() % 100;
+				value = rand() % 1000;
 				if (value <= coeff && i != j)
 				{
-					edges[i].push_back({ j,value - 10 });
+					edges[i].push_back({ j,rand()%1000 });
+					edges_num++;
 				}
 			}
 		}
@@ -154,6 +161,8 @@ bool check_results()
 			printf("\n");
 		}
 	}
+	printf("Vertexes: %d\nEdges: %d\n", vert_num, edges_num);
+	printf("Sequential algorithm time: %f\n", seq_time_en - seq_time_st);
 	return true;
 }
 
