@@ -1,14 +1,14 @@
 #include "algorithms.h"
 #include "d_heap.h"
 
-bool Bellman_Ford(list<edge> *v, int vert_num, int vert, int *dist_par)
+bool Bellman_Ford(list<edge> *v, int vert_num, int vert, int *dist)
 {
 	int curr_edge;
 	list<edge>::iterator it;
 
 	for (int i = 0; i < vert_num; i++)
-		dist_par[i] = INT_MAX;
-	dist_par[vert] = 0;
+		dist[i] = INT_MAX;
+	dist[vert] = 0;
 
 	for (int i = 0; i < vert_num - 1; i++)
 	{
@@ -16,11 +16,14 @@ bool Bellman_Ford(list<edge> *v, int vert_num, int vert, int *dist_par)
 		{
 			/*for (int k = 0; k < vert_num; k++)
 			{*/
-			for (it = v[j].begin(); it != v[j].end(); ++it)
+			if (dist[j] != INT_MAX)
 			{
-				curr_edge = dist_par[j] + it->weight;
-				if (dist_par[it->node]>curr_edge && dist_par[j] != INT_MAX)
-					dist_par[it->node] = curr_edge;
+				for (it = v[j].begin(); it != v[j].end(); ++it)
+				{
+					curr_edge = dist[j] + it->weight;
+					if (dist[it->node] > curr_edge)
+						dist[it->node] = curr_edge;
+				}
 			}
 		}
 	}
@@ -35,15 +38,15 @@ bool Bellman_Ford(list<edge> *v, int vert_num, int vert, int *dist_par)
 		}*/
 		for (it = v[j].begin(); it != v[j].end(); ++it)
 		{
-			curr_edge = dist_par[j] + it->weight;
-			if (dist_par[it->node]>curr_edge)
+			curr_edge = dist[j] + it->weight;
+			if (dist[it->node]>curr_edge)
 				return false;
 		}
 	}
 	return true;
 }
 
-void Dijkstra(list<edge> *v, int vert_num, int vert, int *dist_par)
+void Dijkstra(list<edge> *v, int vert_num, int vert, int *dist)
 {
 	d_heap Q;
 	d_node curr_node;
@@ -51,25 +54,28 @@ void Dijkstra(list<edge> *v, int vert_num, int vert, int *dist_par)
 	int curr_vert, curr_edge;
 
 	for (int i = 0; i < vert_num; i++)
-		dist_par[i] = INT_MAX;
-	dist_par[vert] = 0;
+		dist[i] = INT_MAX;
+	dist[vert] = 0;
 
-	Q.MakeHeap(dist_par, vert_num);
+	Q.MakeHeap(dist, vert_num);
 	//Q.Insert(vert, dist[vert]);
 	while (!Q.IsEmpty())
 	{
 		curr_node = Q.DeleteMin();
 		curr_vert = curr_node.node;
-		for (it = v[curr_vert].begin(); it != v[curr_vert].end(); ++it)
+		if (dist[curr_vert] != INT_MAX)
 		{
-			curr_edge = dist_par[curr_vert] + it->weight;
-			if (dist_par[it->node] > curr_edge && dist_par[curr_vert]!=INT_MAX)
+			for (it = v[curr_vert].begin(); it != v[curr_vert].end(); ++it)
 			{
-				Q.DecreaseWeight(it->node, dist_par[it->node] - curr_edge);
-				dist_par[it->node] = curr_edge;
-				//Q.Delete(it->node);
-				//Q.Insert(it->node, dist[it->node]);
-				
+				curr_edge = dist[curr_vert] + it->weight;
+				if (dist[it->node] > curr_edge)
+				{
+					Q.DecreaseWeight(it->node, dist[it->node] - curr_edge);
+					dist[it->node] = curr_edge;
+					//Q.Delete(it->node);
+					//Q.Insert(it->node, dist[it->node]);
+
+				}
 			}
 		}
 	}
