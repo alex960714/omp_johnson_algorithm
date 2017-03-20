@@ -7,7 +7,7 @@
 using namespace std;
 
 int vert_num, coeff, edges_num;
-int *pre_dist, *delta, **dist_seq, **dist_par;
+int *delta, **dist_seq, **dist_par;
 list<edge> *edges;
 
 double seq_time_st, seq_time_en, par_time_st, par_time_en;
@@ -17,6 +17,7 @@ void generate_graph();
 void read_graph_from_txt();
 void count_edges1();
 void count_edges2(int *curr_dist, int vert);
+void graph_recovery();
 bool check_results();
 void del_mem();
 
@@ -28,7 +29,7 @@ int main(int argc, char **argv)
 		exit(0);
 	}
 	vert_num = atoi(argv[1]);
-	coeff = atoi(argv[2]);
+	coeff = atoi(argv[2])-1;
 	/*vert_num = 2000;
 	coeff = 1;*/
 
@@ -53,10 +54,7 @@ int main(int argc, char **argv)
 	seq_time_en = omp_get_wtime();
 	//end of sequential version
 
-	delete[] pre_dist;
-	pre_dist = new int[vert_num + 1];
-	delete[] delta;
-	delta = new int[vert_num + 1];
+	graph_recovery();
 
 	//parallel version
 	par_time_st = omp_get_wtime();
@@ -81,7 +79,14 @@ int main(int argc, char **argv)
 	//end of parallel version
 	if (vert_num < 20)
 	{
-		printf("\n\nDistances:\n");
+		printf("\n\nDistances (sequential version):\n");
+		for (int i = 0; i < vert_num; i++)
+		{
+			for (int j = 0; j < vert_num; j++)
+				printf("%d ", dist_seq[i][j]);
+			printf("\n");
+		}
+		printf("\n\nDistances (parallel version):\n");
 		for (int i = 0; i < vert_num; i++)
 		{
 			for (int j = 0; j < vert_num; j++)
@@ -104,7 +109,6 @@ int main(int argc, char **argv)
 void mem_init()
 {
 	edges = new list<edge>[vert_num + 1];
-	pre_dist = new int[vert_num + 1];
 	delta = new int[vert_num + 1];
 	dist_seq = new int*[vert_num];
 	for (int i = 0; i < vert_num; i++)
@@ -133,7 +137,7 @@ void generate_graph()
 				value = rand() % 1000;
 				if (value <= coeff && i != j)
 				{
-					edges[i].push_back({ j,rand()%1000 });
+					edges[i].push_back({ j,rand()%1000 - 10 });
 					edges_num++;
 				}
 			}
@@ -198,6 +202,21 @@ void count_edges2(int *curr_dist, int vert)
 	}
 }
 
+void graph_recovery()
+{
+	list<edge>::iterator it;
+	for (int i = 0; i < vert_num; i++)
+	{
+		for (it = edges[i].begin(); it != edges[i].end(); ++it)
+		{
+			(*it).weight -= (delta[i] - delta[(*it).node]);
+		}
+	}
+
+	delete[] delta;
+	delta = new int[vert_num + 1];
+}
+
 bool check_results()
 {
 	for (int i = 0; i < vert_num; i++)
@@ -212,7 +231,6 @@ void del_mem()
 	for (int i = 0; i < vert_num; i++)
 		delete[] dist_par[i];
 	delete[] dist_par;
-	delete[] pre_dist;
 	delete[] delta;
 	delete[] edges;
 }
