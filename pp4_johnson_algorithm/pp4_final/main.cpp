@@ -15,8 +15,8 @@ double seq_time_st, seq_time_en, par_time_st, par_time_en;
 void mem_init();
 void generate_graph();
 void read_graph_from_txt();
-void count_edges1();
-void count_edges2(int *curr_dist, int vert);
+void count_edges1();							//recount edges for Dijkstra algorithm
+void count_edges2(int *curr_dist, int vert);	//recount counted distances for initial conditions
 void graph_recovery();
 bool check_results();
 void del_mem();
@@ -30,12 +30,12 @@ int main(int argc, char **argv)
 	}
 	vert_num = atoi(argv[1]);
 	coeff = atoi(argv[2])-1;
-	/*vert_num = 2000;
-	coeff = 1;*/
 
 	mem_init();
 	generate_graph();
+
 	//sequential version
+
 	seq_time_st = omp_get_wtime();
 
 	if (!Bellman_Ford(edges, vert_num + 1, vert_num, delta))
@@ -52,18 +52,22 @@ int main(int argc, char **argv)
 	}
 
 	seq_time_en = omp_get_wtime();
+
 	//end of sequential version
 
 	graph_recovery();
 
 	//parallel version
+
 	par_time_st = omp_get_wtime();
 	if (!Bellman_Ford(edges, vert_num + 1, vert_num, delta))
 	{
 		printf("\nThere is negative cycle in graph\n");
 		exit(0);
 	}
+
 	count_edges1();
+
 	int i;
 	omp_set_num_threads(10);
 #pragma omp parallel shared(edges,dist_par,vert_num)
@@ -76,7 +80,9 @@ int main(int argc, char **argv)
 		}
 	}
 	par_time_en = omp_get_wtime();
+
 	//end of parallel version
+
 	if (vert_num < 20)
 	{
 		printf("\n\nDistances (sequential version):\n");
@@ -102,6 +108,7 @@ int main(int argc, char **argv)
 		printf("Results are equal\n");
 	else
 		printf("Results are not equal\n");
+
 	del_mem();
 	return 0;
 }
@@ -123,31 +130,26 @@ void generate_graph()
 {
 	int value;
 	edges_num = 0;
-	//edge *curr_edge;
 	srand(time(nullptr));
 	
-	//if (argc == 3)
-		//read_graph_from_txt();
-	/*else
-	{*/
-		for (int i = 0; i < vert_num; i++)
+	for (int i = 0; i < vert_num; i++)
+	{
+		for (int j = 0; j < vert_num; j++)
 		{
-			for (int j = 0; j < vert_num; j++)
+			value = rand() % 1000;
+			if (value <= coeff && i != j)
 			{
-				value = rand() % 1000;
-				if (value <= coeff && i != j)
-				{
-					edges[i].push_back({ j,rand()%1000 - 10 });
-					edges_num++;
-				}
+				edges[i].push_back({ j,rand()%1000 - 10 });
+				edges_num++;
 			}
 		}
-	//}
+	}
 	for (int i = 0; i < vert_num; i++)
 	{
 		if (i != vert_num)
 			edges[vert_num].push_back({ i,0 });
 	}
+
 	if (vert_num < 20)
 	{
 		printf("Adjacency lists:");
