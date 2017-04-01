@@ -1,16 +1,17 @@
 #include <stdio.h>
+#include "tbb\task_scheduler_init.h"
+#include "tbb\parallel_for.h"
+#include "tbb\tick_count.h"
 #include "algorithms.h"
+#include "dijkstra_functor.h"
 #include <list>
 #include <time.h>
 #include <fstream>
-#include <omp.h>
 using namespace std;
 
 int vert_num, coeff, edges_num;
 int *delta, **dist_seq, **dist_par;
 list<edge> *edges;
-
-double seq_time_st, seq_time_en, par_time_st, par_time_en;
 
 void mem_init();
 void generate_graph();
@@ -23,43 +24,23 @@ void del_mem();
 
 int main(int argc, char **argv)
 {
-	if (argc < 3)
+	/*if (argc < 3)
 	{
 		printf("So few arguments\n");
 		exit(0);
 	}
 	vert_num = atoi(argv[1]);
-	coeff = atoi(argv[2])-1;
+	coeff = atoi(argv[2]) - 1;*/
+	vert_num = 10;
+	coeff = 500;
 
 	mem_init();
 	generate_graph();
 
-	//sequential version
-
-	seq_time_st = omp_get_wtime();
-
-	if (!Bellman_Ford(edges, vert_num + 1, vert_num, delta))
-	{
-		printf("\nThere is negative cycle in graph\n");
-		exit(0);
-	}
-	count_edges1();
-
-	for (int i = 0; i < vert_num; i++)
-	{
-		Dijkstra(edges, vert_num, i, dist_seq[i]);
-		count_edges2(dist_seq[i], i);
-	}
-
-	seq_time_en = omp_get_wtime();
-
-	//end of sequential version
-
-	graph_recovery();
-
-	//parallel version
-
-	par_time_st = omp_get_wtime();
+	tbb::task_scheduler_init init(4);
+	tbb::tick_count time;
+	
+	tbb::tick_count par_time_st = tbb::tick_count::now();
 	if (!Bellman_Ford(edges, vert_num + 1, vert_num, delta))
 	{
 		printf("\nThere is negative cycle in graph\n");
@@ -68,30 +49,19 @@ int main(int argc, char **argv)
 
 	count_edges1();
 
-	int i;
-	omp_set_num_threads(4);
-#pragma omp parallel shared(edges,dist_par,vert_num)
+	tbb::parallel_for(tbb::blocked_range<int>(0, vert_num), dij_functor(dist_par, delta, edges));
+	/*int i;
 	{
-		#pragma omp for
 		for (i = 0; i < vert_num; i++)
 		{
 			Dijkstra(edges, vert_num, i, dist_par[i]);
 			count_edges2(dist_par[i], i);
 		}
-	}
-	par_time_en = omp_get_wtime();
-
-	//end of parallel version
+	}*/
+	tbb::tick_count par_time_en = tbb::tick_count::now();
 
 	if (vert_num < 20)
 	{
-		printf("\n\nDistances (sequential version):\n");
-		for (int i = 0; i < vert_num; i++)
-		{
-			for (int j = 0; j < vert_num; j++)
-				printf("%d ", dist_seq[i][j]);
-			printf("\n");
-		}
 		printf("\n\nDistances (parallel version):\n");
 		for (int i = 0; i < vert_num; i++)
 		{
@@ -101,13 +71,7 @@ int main(int argc, char **argv)
 		}
 	}
 	printf("Vertexes: %d\nEdges: %d\n", vert_num, edges_num);
-	printf("Sequential version time: %f\n", seq_time_en - seq_time_st);
-	printf("Parallel version time: %f\n", par_time_en - par_time_st);
-	printf("Acceleration: %f\n", (seq_time_en - seq_time_st) / (par_time_en - par_time_st));
-	if (check_results())
-		printf("Results are equal\n");
-	else
-		printf("Results are not equal\n");
+	printf("Parallel version time: %f\n", (par_time_en - par_time_st).seconds());
 
 	del_mem();
 	return 0;
@@ -131,7 +95,7 @@ void generate_graph()
 	int value;
 	edges_num = 0;
 	srand(time(nullptr));
-	
+
 	for (int i = 0; i < vert_num; i++)
 	{
 		for (int j = 0; j < vert_num; j++)
@@ -139,7 +103,7 @@ void generate_graph()
 			value = rand() % 1000;
 			if (value <= coeff && i != j)
 			{
-				edges[i].push_back({ j,rand()%1000 - 10 });
+				edges[i].push_back({ j,rand() % 10 - 1 });
 				edges_num++;
 			}
 		}
