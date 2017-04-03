@@ -10,7 +10,7 @@
 using namespace std;
 
 int vert_num, coeff, edges_num;
-int *delta, **dist_seq, **dist_par;
+int *delta, **dist_par;
 list<edge> *edges;
 
 void mem_init();
@@ -18,8 +18,8 @@ void generate_graph();
 void read_graph_from_txt();
 void count_edges1();							//recount edges for Dijkstra algorithm
 void count_edges2(int *curr_dist, int vert);	//recount counted distances for initial conditions
-void graph_recovery();
-bool check_results();
+//void graph_recovery();
+//bool check_results();
 void del_mem();
 
 int main(int argc, char **argv)
@@ -49,7 +49,7 @@ int main(int argc, char **argv)
 
 	count_edges1();
 
-	tbb::parallel_for(tbb::blocked_range<int>(0, vert_num), dij_functor(dist_par, delta, edges));
+	tbb::parallel_for(tbb::blocked_range<int>(0, vert_num), dij_functor(vert_num, dist_par, delta, edges));
 	/*int i;
 	{
 		for (i = 0; i < vert_num; i++)
@@ -81,9 +81,6 @@ void mem_init()
 {
 	edges = new list<edge>[vert_num + 1];
 	delta = new int[vert_num + 1];
-	dist_seq = new int*[vert_num];
-	for (int i = 0; i < vert_num; i++)
-		dist_seq[i] = new int[vert_num];
 
 	dist_par = new int*[vert_num];
 	for (int i = 0; i < vert_num; i++)
@@ -168,7 +165,7 @@ void count_edges2(int *curr_dist, int vert)
 	}
 }
 
-void graph_recovery()
+/*void graph_recovery()
 {
 	list<edge>::iterator it;
 	for (int i = 0; i < vert_num; i++)
@@ -190,7 +187,7 @@ bool check_results()
 			if (dist_seq[i][j] != dist_par[i][j])
 				return false;
 	return true;
-}
+}*/
 
 void del_mem()
 {

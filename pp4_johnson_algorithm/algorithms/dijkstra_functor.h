@@ -9,11 +9,12 @@ using namespace std;
 
 class dij_functor
 {
+	int vert_num;
 	int* delta;
 	int** const dist;
 	list<edge> *edges;
 public:
-	dij_functor(int** d, int* del, list<edge> *edg): delta(del), dist(d), edges(edg)
+	dij_functor(int vn, int** d, int* del, list<edge> *edg): vert_num(vn), delta(del), dist(d), edges(edg)
 	{
 	}
 
@@ -21,8 +22,8 @@ public:
 	{
 		for (int i = iter.begin(); i != iter.end(); i++)
 		{
-			Dijkstra(edges, iter.end(), i, dist[i]);
-			for (int j = 0; j < iter.end(); j++)
+			Dijkstra(edges, vert_num, i, dist[i]);
+			for (int j = 0; j < vert_num; j++)
 			{
 				dist[j] += (delta[j] - delta[i]);
 			}
