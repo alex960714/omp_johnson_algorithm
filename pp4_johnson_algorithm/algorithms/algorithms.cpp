@@ -38,7 +38,7 @@ bool Bellman_Ford(list<edge> *v, int vert_num, int vert, int *dist)
 	return true;
 }
 
-void Dijkstra(list<edge> *v, int vert_num, int vert, int *dist)
+void Dijkstra(list<edge> *v, int vert_num, int vert, int *dist, int *delta)
 {
 	d_heap Q;
 	d_node curr_node;
@@ -66,5 +66,9 @@ void Dijkstra(list<edge> *v, int vert_num, int vert, int *dist)
 				}
 			}
 		}
+	}
+	for (int j = 0; j < vert_num; j++)
+	{
+		dist[j] += (delta[j] - delta[vert]);
 	}
 }

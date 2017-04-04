@@ -24,15 +24,15 @@ void del_mem();
 
 int main(int argc, char **argv)
 {
-	/*if (argc < 3)
+	if (argc < 3)
 	{
 		printf("So few arguments\n");
 		exit(0);
 	}
 	vert_num = atoi(argv[1]);
-	coeff = atoi(argv[2]) - 1;*/
-	vert_num = 10;
-	coeff = 500;
+	coeff = atoi(argv[2]) - 1;
+	//vert_num = 10;
+	//coeff = 500;
 
 	mem_init();
 	generate_graph();
@@ -100,7 +100,7 @@ void generate_graph()
 			value = rand() % 1000;
 			if (value <= coeff && i != j)
 			{
-				edges[i].push_back({ j,rand() % 10 - 1 });
+				edges[i].push_back({ j,rand() % 1000 - 10 });
 				edges_num++;
 			}
 		}

@@ -22,11 +22,11 @@ public:
 	{
 		for (int i = iter.begin(); i != iter.end(); i++)
 		{
-			Dijkstra(edges, vert_num, i, dist[i]);
-			for (int j = 0; j < vert_num; j++)
+			Dijkstra(edges, vert_num, i, dist[i], delta);
+			/*for (int j = 0; j < vert_num; j++)
 			{
 				dist[j] += (delta[j] - delta[i]);
-			}
+			}*/
 		}
 	}
 };

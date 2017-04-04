@@ -11,6 +11,6 @@ struct edge
 };
 
 bool Bellman_Ford(list<edge> *v, int vert_num, int vert, int *dist_par);
-void Dijkstra(list<edge> *v, int vert_num, int vert, int *dist_par);
+void Dijkstra(list<edge> *v, int vert_num, int vert, int *dist_par, int *delta);
 
 #endif
