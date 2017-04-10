@@ -1,5 +1,6 @@
 #include "algorithms.h"
 #include "d_heap.h"
+#include <omp.h>
 
 bool Bellman_Ford(list<edge> *v, int vert_num, int vert, int *dist)
 {
@@ -12,18 +13,24 @@ bool Bellman_Ford(list<edge> *v, int vert_num, int vert, int *dist)
 
 	for (int i = 0; i < vert_num - 1; i++)
 	{
-		for (int j = 0; j < vert_num; j++)
-		{
-			if (dist[j] != INT_MAX)
+		//int j;
+//#pragma omp parallel private(j) shared(dist, v)
+		//{
+//#pragma omp for
+			for (int j = 0; j < vert_num; j++)
 			{
-				for (it = v[j].begin(); it != v[j].end(); ++it)
+				if (dist[j] != INT_MAX)
 				{
-					curr_edge = dist[j] + it->weight;
-					if (dist[it->node] > curr_edge)
-						dist[it->node] = curr_edge;
+					for (it = v[j].begin(); it != v[j].end(); ++it)
+					{
+						curr_edge = dist[j] + it->weight;
+//#pragma omp critical
+						if (dist[it->node] > curr_edge)
+							dist[it->node] = curr_edge;
+					}
 				}
 			}
-		}
+		//}
 	}
 
 	for (int j = 0; j < vert_num; j++)

@@ -47,8 +47,8 @@ int main(int argc, char **argv)
 
 	for (int i = 0; i < vert_num; i++)
 	{
-		Dijkstra(edges, vert_num, i, dist_seq[i]);
-		count_edges2(dist_seq[i], i);
+		Dijkstra(edges, vert_num, i, dist_seq[i], delta);
+		//count_edges2(dist_seq[i], i);
 	}
 
 	seq_time_en = omp_get_wtime();
@@ -71,8 +71,8 @@ int main(int argc, char **argv)
 		#pragma omp for
 		for (i = 0; i < vert_num; i++)
 		{
-			Dijkstra(edges, vert_num, i, dist_par[i]);
-			count_edges2(dist_par[i], i);
+			Dijkstra(edges, vert_num, i, dist_par[i], delta);
+			//count_edges2(dist_par[i], i);
 		}
 	}
 	par_time_en = omp_get_wtime();
