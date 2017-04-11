@@ -8,10 +8,12 @@
 using namespace std;
 
 int vert_num, coeff, edges_num;
-int *delta, *dist_seq, *dist_par, *edg;
-list<edge> *edges;
+int *delta=nullptr, *dist_seq=nullptr, *dist_par=nullptr, *edg=nullptr;
+list<edge> *edges=nullptr;
+int *sendcounts=nullptr, *displs=nullptr;
 
 double seq_time_st, seq_time_en, par_time_st, par_time_en;
+int ProcNum, ProcRank;
 
 void mem_init();
 void generate_graph();
@@ -32,13 +34,20 @@ int main(int argc, char **argv)
 	vert_num = atoi(argv[1]);
 	coeff = atoi(argv[2]) - 1;
 
+	MPI_Init(&argc, &argv);
+
+	MPI_Comm_rank(MPI_COMM_WORLD, &ProcRank);
+	MPI_Comm_size(MPI_COMM_WORLD, &ProcNum);
+
 	mem_init();
-	generate_graph();
+	if(!ProcRank)
+		generate_graph();
+	MPI_Bcast(edg, edges_num * 2, MPI_INT, 0, MPI_COMM_WORLD);
 
-	//parallel version
+	//parallel version	
 
-	par_time_st = omp_get_wtime();
-	if (!Bellman_Ford(edges, vert_num + 1, vert_num, delta))
+	par_time_st = MPI_Wtime();
+	if (!Bellman_Ford(edges, vert_num + 1, vert_num, delta))   //!!!!!!!!!!!!!!!!!!!!!!!
 	{
 		printf("\nThere is negative cycle in graph\n");
 		exit(0);
@@ -53,37 +62,67 @@ int main(int argc, char **argv)
 #pragma omp for
 		for (i = 0; i < vert_num; i++)
 		{
-			Dijkstra(edges, vert_num, i, dist_par + i*vert_num, delta);
+			Dijkstra(edges, vert_num, i, dist_par + i*vert_num, delta);  //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 			//count_edges2(dist_par[i], i);
 		}
 	}
-	par_time_en = omp_get_wtime();
+	par_time_en = MPI_Wtime();
 
 	//end of parallel version
 
-	if (vert_num < 20)
+	if (!ProcRank)
 	{
-		printf("\n\nDistances (parallel version):\n");
-		for (int i = 0; i < vert_num; i++)
+		if (vert_num < 20)
 		{
-			for (int j = 0; j < vert_num; j++)
-				printf("%d ", dist_par[i*vert_num+j]);
-			printf("\n");
+			printf("\n\nDistances (parallel version):\n");
+			for (int i = 0; i < vert_num; i++)
+			{
+				for (int j = 0; j < vert_num; j++)
+					printf("%d ", dist_par[i*vert_num + j]);
+				printf("\n");
+			}
 		}
+		printf("Vertexes: %d\nEdges: %d\n", vert_num, edges_num);
+		printf("Parallel version time: %f\n", par_time_en - par_time_st);
 	}
-	printf("Vertexes: %d\nEdges: %d\n", vert_num, edges_num);
-	printf("Parallel version time: %f\n", par_time_en - par_time_st);
 
 	del_mem();
+	MPI_Finalize();
 	return 0;
 }
 
 void mem_init()
 {
-	edges = new list<edge>[vert_num + 1];
-	delta = new int[vert_num + 1];
+	sendcounts = new int[ProcNum];
+	displs = new int[ProcNum];
+	if (!ProcRank)
+	{
+		edges = new list<edge>[vert_num + 1];
+		dist_par = new int[vert_num*vert_num];
 
-	dist_par = new int[vert_num*vert_num];
+		int vert_proc = vert_num / (ProcNum - 1);
+		int vert_add = vert_num % (ProcNum - 1);
+		sendcounts[0] = 0;
+		displs[0] = 0;
+		for (int i = 1; i <= vert_add; i++)
+		{
+			sendcounts[i] = (vert_proc + 1) * vert_num;
+			displs[i] = sendcounts[i - 1] + displs[i - 1];
+		}
+		for (int i = vert_add + 1; i < ProcNum; i++)
+		{
+			sendcounts[i] = vert_proc * vert_num;
+			displs[i] = sendcounts[i - 1] + displs[i - 1];
+		}
+	}
+	MPI_Bcast(sendcounts, ProcNum, MPI_INT, 0, MPI_COMM_WORLD);
+	MPI_Bcast(displs, ProcNum, MPI_INT, 0, MPI_COMM_WORLD);
+	
+	delta = new int[vert_num + 1];
+	if (ProcRank)
+	{
+		dist_par = new int[sendcounts[ProcRank]];
+	}
 }
 
 void generate_graph()
@@ -109,7 +148,7 @@ void generate_graph()
 		if (i != vert_num)
 			edges[vert_num].push_back({ i,0 });
 	}
-	edg = new int[2*(edges_num + vert_num)+ vert_num + 1];
+	edg = new int[2*(edges_num + vert_num)];
 
 
 	if (vert_num < 20)
