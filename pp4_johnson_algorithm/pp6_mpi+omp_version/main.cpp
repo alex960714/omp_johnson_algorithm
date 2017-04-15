@@ -181,7 +181,7 @@ void generate_graph()
 		for (int i = 0; i < vert_num; i++)
 		{
 			printf("\n%d:", i);
-			for (int j = vert_disp[i]; i < vert_disp[i+1]; j++)
+			for (int j = vert_disp[i]; j < vert_disp[i+1]; j++)
 			{
 				printf(" {%d, %d} ", vert_adj[j], edg[i]);
 			}
@@ -210,12 +210,11 @@ void read_graph_from_txt()
 
 void count_edges1()
 {
-	list<edge>::iterator it;
 	for (int i = 0; i < vert_num; i++)
 	{
-		for (it = edges[i].begin(); it != edges[i].end(); ++it)
+		for (int j = vert_disp[i]; j < vert_disp[i+1]; j++)
 		{
-			(*it).weight += (delta[i] - delta[(*it).node]);
+			edg[vert_adj[j]] += (delta[i] - delta[vert_adj[j]]);
 		}
 	}
 }
@@ -230,12 +229,11 @@ void count_edges2(int *curr_dist, int vert)
 
 void graph_recovery()
 {
-	list<edge>::iterator it;
 	for (int i = 0; i < vert_num; i++)
 	{
-		for (it = edges[i].begin(); it != edges[i].end(); ++it)
+		for (int j = vert_disp[i]; j < vert_disp[i + 1]; j++)
 		{
-			(*it).weight -= (delta[i] - delta[(*it).node]);
+			edg[vert_adj[j]] -= (delta[i] - delta[vert_adj[j]]);
 		}
 	}
 
