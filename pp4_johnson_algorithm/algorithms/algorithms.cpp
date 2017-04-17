@@ -60,7 +60,7 @@ bool Bellman_Ford(int * vert_disp, int * vert_adj, int * edges, int vert_num, in
 		{
 			if (dist[j] != INT_MAX)
 			{
-				for (int k = vert_disp[j]; k < vert_num && k < vert_disp[j+1]; k++)
+				for (int k = vert_disp[j]; k < vert_disp[j+1]; k++)
 				{
 					curr_edge = dist[j] + edges[k];
 					if (dist[vert_adj[k]] > curr_edge)
@@ -72,7 +72,7 @@ bool Bellman_Ford(int * vert_disp, int * vert_adj, int * edges, int vert_num, in
 
 	for (int j = 0; j < vert_num; j++)
 	{
-		for (int k = vert_disp[j]; k < vert_num && k < vert_disp[j + 1]; k++)
+		for (int k = vert_disp[j]; k < vert_disp[j + 1]; k++)
 		{
 			curr_edge = dist[j] + edges[k];
 			if (dist[vert_adj[k]] > curr_edge)
@@ -134,7 +134,7 @@ void Dijkstra(int * vert_disp, int * vert_adj, int * edges, int vert_num, int ve
 		curr_vert = curr_node.node;
 		if (dist[curr_vert] != INT_MAX)
 		{
-			for (int i = vert_disp[curr_vert]; i < vert_num && i < vert_disp[curr_vert+1]; i++)
+			for (int i = vert_disp[curr_vert]; i < vert_disp[curr_vert+1]; i++)
 			{
 				curr_edge = dist[curr_vert] + edges[i];
 				if (dist[vert_adj[i]] > curr_edge)
