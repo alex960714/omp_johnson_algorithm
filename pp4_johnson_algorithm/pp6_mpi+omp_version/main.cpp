@@ -170,7 +170,7 @@ void generate_graph()
 			value = rand() % 1000;
 			if (value <= coeff && i != j)
 			{
-				edges[i].push_back({ j,rand() % 10 });
+				edges[i].push_back({ j,rand() % 10 - 1 });
 				edges_num++;
 			}
 		}

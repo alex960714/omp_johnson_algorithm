@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pp4_johnson_algorithm", "pp4_johnson_algorithm\pp4_johnson_algorithm.vcxproj", "{135D1DB3-64A6-4FF5-856E-91CF6BCA6C1A}"
 EndProject
@@ -18,6 +18,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pp5_combine_version", "pp5_combine_version\pp5_combine_version.vcxproj", "{07083EDE-75B4-4A38-AFC2-98A9EBB8A132}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pp6_mpi+omp_version", "pp6_mpi+omp_version\pp6_mpi+omp_version.vcxproj", "{EFEC7CC2-8982-4230-A536-F07B28C8578E}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pp6_combine_version", "pp6_combine_version\pp6_combine_version.vcxproj", "{DCF371ED-95F0-426B-95EB-B27897DE9080}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -91,6 +93,14 @@ Global
 		{EFEC7CC2-8982-4230-A536-F07B28C8578E}.Release|x64.Build.0 = Release|x64
 		{EFEC7CC2-8982-4230-A536-F07B28C8578E}.Release|x86.ActiveCfg = Release|Win32
 		{EFEC7CC2-8982-4230-A536-F07B28C8578E}.Release|x86.Build.0 = Release|Win32
+		{DCF371ED-95F0-426B-95EB-B27897DE9080}.Debug|x64.ActiveCfg = Debug|x64
+		{DCF371ED-95F0-426B-95EB-B27897DE9080}.Debug|x64.Build.0 = Debug|x64
+		{DCF371ED-95F0-426B-95EB-B27897DE9080}.Debug|x86.ActiveCfg = Debug|Win32
+		{DCF371ED-95F0-426B-95EB-B27897DE9080}.Debug|x86.Build.0 = Debug|Win32
+		{DCF371ED-95F0-426B-95EB-B27897DE9080}.Release|x64.ActiveCfg = Release|x64
+		{DCF371ED-95F0-426B-95EB-B27897DE9080}.Release|x64.Build.0 = Release|x64
+		{DCF371ED-95F0-426B-95EB-B27897DE9080}.Release|x86.ActiveCfg = Release|Win32
+		{DCF371ED-95F0-426B-95EB-B27897DE9080}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

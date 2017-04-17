@@ -120,6 +120,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>C:\Program Files %28x86%29\Microsoft SDKs\MPI\Include;C:\Program Files %28x86%29\Microsoft SDKs\MPI\Include\x86;C:\Users\User\Documents\GitHub\omp_johnson_algorithm\pp4_johnson_algorithm\algorithms;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
