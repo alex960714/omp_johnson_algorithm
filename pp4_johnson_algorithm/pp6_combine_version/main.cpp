@@ -61,13 +61,11 @@ int main(int argc, char **argv)
 			for (int i = 0; i < vert_num + 1; i++)
 				printf("%d ", delta[i]);
 			printf("\n");*/
-		}
-		if (!isNegativeCycle)
-		{
+
 			for (int i = 0; i < vert_num; i++)
 			{
 				Dijkstra(vert_disp, vert_adj, edg, vert_num, i, dist_seq + i*vert_num, delta);
-				//count_edges2(dist_seq + i*vert_num,i);
+				count_edges2(dist_seq + i*vert_num,i);
 			}
 
 			seq_time_en = MPI_Wtime();
@@ -87,7 +85,6 @@ int main(int argc, char **argv)
 		MPI_Bcast(displs, ProcNum, MPI_INT, 0, MPI_COMM_WORLD);
 		MPI_Bcast(vert_disp, vert_num + 1, MPI_INT, 0, MPI_COMM_WORLD);
 		MPI_Bcast(vert_adj, vert_num + edges_num, MPI_INT, 0, MPI_COMM_WORLD);
-		MPI_Bcast(edg, vert_num + edges_num, MPI_INT, 0, MPI_COMM_WORLD);
 	
 		//parallel version	
 		MPI_Barrier(MPI_COMM_WORLD);
@@ -103,13 +100,14 @@ int main(int argc, char **argv)
 			{
 				isNegativeCycle = 0;
 				count_edges1();
-				printf("\n\n");
+				/*printf("\n\n");
 				for (int i = 0; i < vert_num; i++)
 					printf("%d ", delta[i]);
-				printf("\n");
+				printf("\n");*/
 			}
 		}
 
+		MPI_Bcast(edg, vert_num + edges_num, MPI_INT, 0, MPI_COMM_WORLD);
 		MPI_Bcast(delta, vert_num + 1, MPI_INT, 0, MPI_COMM_WORLD);
 		int i, vert_num_local, start_local;
 		omp_set_num_threads(4);
@@ -122,7 +120,9 @@ int main(int argc, char **argv)
 			for (i = 0; i < vert_num_local; i++)
 			{
 				Dijkstra(vert_disp, vert_adj, edg, vert_num, start_local + i, dist_send + i*vert_num, delta);
-				//count_edges2(dist_send + i*vert_num, start_local + i);
+				//TODO: Fix bug during 2nd iteration at Dijkstra. Crash on graphs, which have more than 10 vertexes
+				count_edges2(dist_send + i*vert_num, start_local + i);
+
 			}
 		}
 		MPI_Gatherv(dist_send, sendcounts[ProcRank], MPI_INT, dist_par, sendcounts, displs, MPI_INT, 0, MPI_COMM_WORLD);
@@ -219,7 +219,7 @@ void generate_graph()
 			value = rand() % 1000;
 			if (value <= coeff && i != j)
 			{
-				edges[i].push_back({ j,rand() % 10 - 1 });
+				edges[i].push_back({ j,rand() % 1000 - 10 });
 				edges_num++;
 			}
 		}
@@ -249,7 +249,7 @@ void generate_graph()
 
 	delete[] edges;
 
-	if (vert_num < 20)
+	if (vert_num <= 15)
 	{
 		printf("Adjacency lists:");
 		for (int i = 0; i < vert_num; i++)
@@ -326,6 +326,12 @@ bool check_results()
 
 void del_mem()
 {
+	delete[] sendcounts;
+	delete[] displs;
+	delete[] dist_send;
+	delete[] edg;
+	delete[] vert_adj;
+	delete[] vert_disp;
 	delete[] dist_seq;
 	delete[] dist_par;
 	delete[] delta;

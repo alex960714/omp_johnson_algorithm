@@ -145,8 +145,8 @@ void Dijkstra(int * vert_disp, int * vert_adj, int * edges, int vert_num, int ve
 			}
 		}
 	}
-	for (int j = 0; j < vert_num; j++)
+	/*for (int j = 0; j < vert_num; j++)
 	{
 		dist[j] += (delta[j] - delta[vert]);
-	}
+	}*/
 }
