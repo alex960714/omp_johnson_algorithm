@@ -21,6 +21,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pp6_mpi+omp_version", "pp6_
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pp6_combine_version", "pp6_combine_version\pp6_combine_version.vcxproj", "{DCF371ED-95F0-426B-95EB-B27897DE9080}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pp6_final", "pp6_final\pp6_final.vcxproj", "{9D958329-DB2C-4128-BF23-4AA580E54867}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -101,6 +103,14 @@ Global
 		{DCF371ED-95F0-426B-95EB-B27897DE9080}.Release|x64.Build.0 = Release|x64
 		{DCF371ED-95F0-426B-95EB-B27897DE9080}.Release|x86.ActiveCfg = Release|Win32
 		{DCF371ED-95F0-426B-95EB-B27897DE9080}.Release|x86.Build.0 = Release|Win32
+		{9D958329-DB2C-4128-BF23-4AA580E54867}.Debug|x64.ActiveCfg = Debug|x64
+		{9D958329-DB2C-4128-BF23-4AA580E54867}.Debug|x64.Build.0 = Debug|x64
+		{9D958329-DB2C-4128-BF23-4AA580E54867}.Debug|x86.ActiveCfg = Debug|Win32
+		{9D958329-DB2C-4128-BF23-4AA580E54867}.Debug|x86.Build.0 = Debug|Win32
+		{9D958329-DB2C-4128-BF23-4AA580E54867}.Release|x64.ActiveCfg = Release|x64
+		{9D958329-DB2C-4128-BF23-4AA580E54867}.Release|x64.Build.0 = Release|x64
+		{9D958329-DB2C-4128-BF23-4AA580E54867}.Release|x86.ActiveCfg = Release|Win32
+		{9D958329-DB2C-4128-BF23-4AA580E54867}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
