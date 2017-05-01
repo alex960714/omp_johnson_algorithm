@@ -1,7 +1,6 @@
 #include "algorithms.h"
 #include "d_heap.h"
 #include <omp.h>
-#include "mpi.h"
 
 bool Bellman_Ford(list<edge> *v, int vert_num, int vert, int *dist)
 {

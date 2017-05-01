@@ -3,6 +3,7 @@
 #include <list>
 #include <time.h>
 #include <fstream>
+#include <iostream>
 #include <omp.h>
 #include "mpi.h"
 using namespace std;
@@ -35,6 +36,8 @@ int main(int argc, char **argv)
 	}
 	vert_num = atoi(argv[1]);
 	coeff = atoi(argv[2]) - 1;
+	/*vert_num = 10;
+	coeff = 500;*/
 
 	MPI_Init(&argc, &argv);
 
@@ -50,17 +53,13 @@ int main(int argc, char **argv)
 		seq_time_st = MPI_Wtime();
 		if (!Bellman_Ford(vert_disp, vert_adj, edg, vert_num + 1, vert_num, delta))
 		{
-			printf("\nThere is negative cycle in graph\n");
+			cout << endl << "There is negative cycle in graph" << endl;
 			isNegativeCycle = 1;
 		}
 		else
 		{
 			isNegativeCycle = 0;
 			count_edges1();
-			/*printf("\n\n");
-			for (int i = 0; i < vert_num + 1; i++)
-				printf("%d ", delta[i]);
-			printf("\n");*/
 
 			for (int i = 0; i < vert_num; i++)
 			{
@@ -81,31 +80,31 @@ int main(int argc, char **argv)
 		if (!ProcRank)
 			graph_recovery();
 
-		MPI_Bcast(sendcounts, ProcNum, MPI_INT, 0, MPI_COMM_WORLD);
-		MPI_Bcast(displs, ProcNum, MPI_INT, 0, MPI_COMM_WORLD);
-		MPI_Bcast(vert_disp, vert_num + 1, MPI_INT, 0, MPI_COMM_WORLD);
-		MPI_Bcast(vert_adj, vert_num + edges_num, MPI_INT, 0, MPI_COMM_WORLD);
-	
 		//parallel version	
 		MPI_Barrier(MPI_COMM_WORLD);
 		par_time_st = MPI_Wtime();
+
+		MPI_Bcast(sendcounts, ProcNum, MPI_INT, 0, MPI_COMM_WORLD);
+		MPI_Bcast(displs, ProcNum, MPI_INT, 0, MPI_COMM_WORLD);
+		MPI_Bcast(vert_disp, vert_num + 2, MPI_INT, 0, MPI_COMM_WORLD);
+		MPI_Bcast(vert_adj, vert_num + edges_num, MPI_INT, 0, MPI_COMM_WORLD);
+
+		dist_send = new int[sendcounts[ProcRank]];
+	
 		if (!ProcRank)
 		{
 			if (!Bellman_Ford(vert_disp, vert_adj, edg, vert_num + 1, vert_num, delta))
 			{
 				isNegativeCycle = 1;
-				printf("\nThere is negative cycle in graph\n");
+				cout << endl << "There is negative cycle in graph" << endl;
 			}
 			else
 			{
 				isNegativeCycle = 0;
 				count_edges1();
-				/*printf("\n\n");
-				for (int i = 0; i < vert_num; i++)
-					printf("%d ", delta[i]);
-				printf("\n");*/
 			}
 		}
+		MPI_Bcast(&isNegativeCycle, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
 		MPI_Bcast(edg, vert_num + edges_num, MPI_INT, 0, MPI_COMM_WORLD);
 		MPI_Bcast(delta, vert_num + 1, MPI_INT, 0, MPI_COMM_WORLD);
@@ -114,6 +113,7 @@ int main(int argc, char **argv)
 
 		vert_num_local = sendcounts[ProcRank] / vert_num;
 		start_local = displs[ProcRank] / vert_num;
+
 #pragma omp parallel shared(vert_disp, vert_adj, edg, dist_send, vert_num, vert_num_local, start_local) private(i)
 		{
 #pragma omp for
@@ -121,8 +121,8 @@ int main(int argc, char **argv)
 			{
 				Dijkstra(vert_disp, vert_adj, edg, vert_num, start_local + i, dist_send + i*vert_num, delta);
 				//TODO: Fix bug during 2nd iteration at Dijkstra. Crash on graphs, which have more than 10 vertexes
+				//It was the foolest bug
 				count_edges2(dist_send + i*vert_num, start_local + i);
-
 			}
 		}
 		MPI_Gatherv(dist_send, sendcounts[ProcRank], MPI_INT, dist_par, sendcounts, displs, MPI_INT, 0, MPI_COMM_WORLD);
@@ -136,29 +136,29 @@ int main(int argc, char **argv)
 		{
 			if (vert_num < 20)
 			{
-				printf("\n\nDistances (sequential version):\n");
+				cout << endl << endl << "Distances (sequential version):" << endl;
 				for (int i = 0; i < vert_num; i++)
 				{
 					for (int j = 0; j < vert_num; j++)
-						printf("%d ", dist_seq[i*vert_num+j]);
-					printf("\n");
+						cout << dist_seq[i*vert_num + j] << " ";
+					cout << endl;
 				}
-				printf("\n\nDistances (parallel version):\n");
+				cout << endl << endl << "Distances (parallel version):" << endl;
 				for (int i = 0; i < vert_num; i++)
 				{
 					for (int j = 0; j < vert_num; j++)
-						printf("%d ", dist_par[i*vert_num+j]);
-					printf("\n");
+						cout << dist_par[i*vert_num + j] << " ";
+					cout << endl;
 				}
 			}
-			printf("Vertexes: %d\nEdges: %d\n", vert_num, edges_num);
-			printf("Sequential version time: %f\n", seq_time_en - seq_time_st);
-			printf("Parallel version time: %f\n", par_time_en - par_time_st);
-			printf("Boost: %f\n", (seq_time_en - seq_time_st) / (par_time_en - par_time_st));
+			cout << "Vertexes: " << vert_num << endl << "Edges: " << edges_num << endl;
+			cout << "Sequential version time: " << seq_time_en - seq_time_st << endl;
+			cout << "Parallel version time: " << par_time_en - par_time_st << endl;
+			cout << "Boost: " << (seq_time_en - seq_time_st) / (par_time_en - par_time_st) << endl;
 			if (check_results())
-				printf("Results are equal\n");
+				cout << "Results are equal" << endl;
 			else
-				printf("Results are not equal\n");
+				cout << "Results are not equal" << endl;
 		}
 	}
 	del_mem();
@@ -178,7 +178,6 @@ void mem_init()
 
 		int vert_proc = vert_num / ProcNum;
 		int vert_add = vert_num % ProcNum;
-		//sendcounts[0] = 0;
 		displs[0] = 0;
 		for (int i = 0; i < vert_add; i++)
 		{
@@ -196,10 +195,9 @@ void mem_init()
 
 	MPI_Bcast(&edges_num, 1, MPI_INT, 0, MPI_COMM_WORLD);
 	delta = new int[vert_num + 1];
-	dist_send = new int[sendcounts[ProcRank]];
 	if (ProcRank)
 	{
-		vert_disp = new int[vert_num + 1];
+		vert_disp = new int[vert_num + 2];
 		vert_adj = new int[edges_num + vert_num];
 		edg = new int[edges_num + vert_num];
 	}
@@ -251,14 +249,15 @@ void generate_graph()
 
 	if (vert_num <= 15)
 	{
-		printf("Adjacency lists:");
+		cout << "Adjacency lists:" << endl;
 		for (int i = 0; i < vert_num; i++)
 		{
-			printf("\n%d:", i);
+			cout << i << ":";
 			for (int j = vert_disp[i]; j < vert_disp[i + 1]; j++)
 			{
-				printf(" {%d, %d} ", vert_adj[j], edg[j]);
+				cout << " {" << vert_adj[j] << ", " << edg[j] << "}";
 			}
+			cout << endl;
 		}
 	}
 }
@@ -332,9 +331,12 @@ void del_mem()
 	delete[] edg;
 	delete[] vert_adj;
 	delete[] vert_disp;
-	delete[] dist_seq;
-	delete[] dist_par;
 	delete[] delta;
+	if (!ProcRank)
+	{
+		delete[] dist_seq;
+		delete[] dist_par;
+	}
 }
 
 void print_arrays()
